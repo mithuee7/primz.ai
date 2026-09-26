@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Primz</title>
-  <link rel="icon" href="/logo.png">
+<link rel="icon" href="/logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -117,13 +117,13 @@
 
 <nav>
   <div class="wrap">
-    <div class="logo" onclick="go('home')">Primz</div>
+    <a class="logo" href="/" onclick="return navTo(event,'home')">Primz</a>
     <div class="navlinks">
-      <a onclick="go('realestate')" data-nav="realestate">Real Estate</a>
-      <a onclick="go('creators')" data-nav="creators">Creators</a>
-      <a onclick="go('localbusiness')" data-nav="localbusiness">Local Business</a>
+      <a href="/realestate" onclick="return navTo(event,'realestate')" data-nav="realestate">Real Estate</a>
+      <a href="/creators" onclick="return navTo(event,'creators')" data-nav="creators">Creators</a>
+      <a href="/localbusiness" onclick="return navTo(event,'localbusiness')" data-nav="localbusiness">Local Business</a>
     </div>
-    <a class="navcta" onclick="go('home'); document.getElementById('customhome').scrollIntoView()">Get started</a>
+    <a class="navcta" href="/" onclick="navTo(event,'home'); setTimeout(()=>document.getElementById('customhome').scrollIntoView(),0); return false;">Get started</a>
   </div>
 </nav>
 
@@ -146,15 +146,15 @@
       <div class="sectionlabel">Who we build for</div>
       <div class="sectiontitle">Pick your world</div>
       <div class="segrowgrid">
-        <div class="segitem" onclick="go('realestate')">
+        <div class="segitem" onclick="navTo(event,'realestate')">
           <h3>Real Estate</h3>
           <p>AI sales follow up, a receptionist that never misses a buyer call, and a listings site built for your brand.</p>
         </div>
-        <div class="segitem" onclick="go('creators')">
+        <div class="segitem" onclick="navTo(event,'creators')">
           <h3>Creators</h3>
           <p>Track every account from one dashboard and let a bot handle your DMs and comments.</p>
         </div>
-        <div class="segitem" onclick="go('localbusiness')">
+        <div class="segitem" onclick="navTo(event,'localbusiness')">
           <h3>Local Business</h3>
           <p>A fast website and a receptionist that answers patient or client calls around the clock.</p>
         </div>
@@ -325,14 +325,23 @@
     document.getElementById(key).innerHTML = buildSegmentPage(key);
   });
 
-  function go(pageId){
+  function go(pageId, skipPush){
     document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
     document.getElementById(pageId).classList.add('active');
     document.querySelectorAll('.navlinks a').forEach(a=>a.classList.remove('active'));
     const navA = document.querySelector(`.navlinks a[data-nav="${pageId}"]`);
     if(navA) navA.classList.add('active');
     window.scrollTo({top:0,behavior:'instant'});
-    history.replaceState(null,'', pageId==='home' ? '#' : '#'+pageId);
+    if(!skipPush){
+      const path = pageId === 'home' ? '/' : '/' + pageId;
+      history.pushState({page:pageId}, '', path);
+    }
+  }
+
+  function navTo(e, pageId){
+    if(e) e.preventDefault();
+    go(pageId);
+    return false;
   }
 
   document.querySelectorAll('.customform').forEach(f=>{
@@ -363,12 +372,12 @@
     });
   });
 
-  function routeFromHash(){
-    const h = window.location.hash.replace('#','');
-    if(segments[h]) go(h); else go('home');
+  function routeFromPath(skipPush){
+    const p = window.location.pathname.replace(/^\//,'').replace(/\/$/,'');
+    if(segments[p]) go(p, skipPush); else go('home', skipPush);
   }
-  window.addEventListener('hashchange', routeFromHash);
-  routeFromHash();
+  window.addEventListener('popstate', ()=>routeFromPath(true));
+  routeFromPath(true);
 </script>
 
 </body>

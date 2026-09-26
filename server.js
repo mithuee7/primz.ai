@@ -25,6 +25,12 @@ const supabase = createClient(
 // Public static site (index.html, privacy.html). admin.html is NOT in here on purpose.
 app.use(express.static(path.join(__dirname, 'public')));
 
+// These are client-rendered pages inside index.html, but need a real server
+// route too so a direct visit or a page refresh on these URLs still works.
+app.get(['/realestate', '/creators', '/localbusiness'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
 // ---------- Public: receive custom requests from the site ----------
 app.post('/api/requests', async (req, res) => {
   const { name, contact, needs, segment } = req.body || {};

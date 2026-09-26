@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Primz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0a0a;
+    --surface:#131313;
+    --surface2:#1a1a1a;
+    --border:#262626;
+    --bordersoft:#1e1e1e;
+    --text:#fafafa;
+    --textdim:#8c8c8c;
+    --textfaint:#565656;
+    box-sizing:border-box;
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  *{box-sizing:inherit;margin:0;padding:0;}
+  html{scroll-behavior:smooth;scroll-padding-top:env(safe-area-inset-top,0px);}
+  html,body{height:100%;background:var(--bg);color:var(--text);}
+  body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;-webkit-font-smoothing:antialiased;line-height:1.5;overflow-x:hidden;}
+  img{max-width:100%;}
+  a{color:inherit;text-decoration:none;}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 28px;}
+
+  nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;background:rgba(10,10,10,0.85);backdrop-filter:blur(10px);border-bottom:1px solid var(--bordersoft);}
+  nav .wrap{display:flex;align-items:center;justify-content:space-between;height:64px;}
+  .logo{font-weight:700;font-size:18px;letter-spacing:0.02em;cursor:pointer;}
+  .navlinks{display:flex;gap:32px;font-size:14px;color:var(--textdim);}
+  .navlinks a{cursor:pointer;}
+  .navlinks a:hover,.navlinks a.active{color:var(--text);}
+  .navcta{font-size:14px;font-weight:500;padding:9px 18px;border-radius:8px;background:var(--text);color:var(--bg);transition:transform .12s ease, filter .12s ease;cursor:pointer;}
+  .navcta:active{transform:scale(0.96);filter:brightness(0.9);}
+  @media (max-width:720px){ .navlinks{display:none;} }
+
+  .page{display:none;}
+  .page.active{display:block;}
+
+  .hero{padding:96px 0 64px;}
+  .herogrid{max-width:640px;}
+  @media (max-width:860px){ .hero{padding:56px 0 40px;} }
+  .hero h1{font-size:clamp(34px,5vw,52px);font-weight:700;letter-spacing:0.025em;line-height:1.08;color:var(--text);}
+  .hero p.sub{margin-top:20px;font-size:17px;color:var(--textdim);max-width:46ch;line-height:1.6;}
+  .heroactions{display:flex;gap:12px;margin-top:32px;flex-wrap:wrap;}
+
+  .btn{display:inline-flex;align-items:center;gap:8px;font-size:14.5px;font-weight:500;padding:12px 22px;border-radius:9px;border:1px solid var(--border);transition:transform .12s ease, filter .12s ease, background .12s ease, border-color .12s ease;cursor:pointer;background:transparent;color:var(--text);}
+  .btn:active{transform:scale(0.96);filter:brightness(0.85);}
+  .btnprimary{background:var(--text);color:var(--bg);border-color:var(--text);}
+  .btnprimary:active{filter:brightness(0.88);}
+  .btnghost:hover{border-color:var(--textdim);}
+
+  .segrow{padding:64px 0 8px;}
+  .segrowgrid{display:flex;gap:32px;flex-wrap:wrap;}
+  .segitem{border:1px solid var(--border);border-radius:12px;padding:22px;flex:1;min-width:220px;cursor:pointer;transition:border-color .15s ease;}
+  .segitem:hover{border-color:var(--textdim);}
+  .segitem h3{font-size:16px;font-weight:600;margin-bottom:8px;}
+  .segitem p{font-size:13.5px;color:var(--textdim);line-height:1.55;}
+
+  .sectionlabel{font-size:13px;color:var(--textfaint);margin-bottom:10px;}
+  .sectiontitle{font-size:clamp(24px,3vw,32px);font-weight:700;letter-spacing:0.02em;margin-bottom:36px;}
+
+  .servicepanel{padding:56px 0 80px;}
+  .servicelayout{display:grid;grid-template-columns:1fr 320px;gap:56px;align-items:start;}
+  @media (max-width:860px){ .servicelayout{grid-template-columns:1fr;} }
+  .servicelist{display:flex;flex-direction:column;}
+  .servicerow{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;padding:22px 0;border-bottom:1px solid var(--bordersoft);}
+  .servicerow:first-child{padding-top:0;}
+  .servicename{font-size:17px;font-weight:600;letter-spacing:0.01em;}
+  .servicedesc{font-size:14.5px;color:var(--textdim);margin-top:6px;max-width:46ch;line-height:1.55;}
+  .serviceprice{text-align:right;white-space:nowrap;}
+  .priceold{font-size:13px;color:var(--textfaint);text-decoration:line-through;display:block;}
+  .pricenew{font-size:17px;font-weight:700;color:var(--text);}
+  .sidenote{border:1px solid var(--border);border-radius:12px;padding:22px;background:var(--surface);}
+  .sidenote h4{font-size:15px;font-weight:600;margin-bottom:8px;}
+  .sidenote p{font-size:13.5px;color:var(--textdim);line-height:1.6;}
+
+  .how{padding:64px 0;border-top:1px solid var(--bordersoft);}
+  .howgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:32px;margin-top:32px;}
+  @media (max-width:720px){ .howgrid{grid-template-columns:1fr;} }
+  .howstep{border-top:1px solid var(--border);padding-top:16px;}
+  .howstep .n{font-size:13px;color:var(--textfaint);margin-bottom:10px;}
+  .howstep h3{font-size:16px;font-weight:600;margin-bottom:8px;}
+  .howstep p{font-size:14px;color:var(--textdim);line-height:1.6;}
+
+  .custom{padding:72px 0;border-top:1px solid var(--bordersoft);}
+  .customgrid{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:start;}
+  @media (max-width:860px){ .customgrid{grid-template-columns:1fr;gap:32px;} }
+  .custom h2{font-size:clamp(24px,3vw,30px);font-weight:700;letter-spacing:0.02em;}
+  .custom p.lead{color:var(--textdim);margin-top:14px;font-size:15px;line-height:1.6;max-width:42ch;}
+  form{display:flex;flex-direction:column;gap:14px;}
+  label{font-size:13px;color:var(--textdim);margin-bottom:6px;display:block;}
+  input,textarea{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:12px 14px;color:var(--text);font-family:inherit;font-size:14.5px;transition:border-color .15s ease;}
+  input:focus,textarea:focus{outline:none;border-color:var(--textdim);}
+  textarea{resize:vertical;min-height:100px;}
+  .field{display:flex;flex-direction:column;}
+  .formsubmit{align-self:flex-start;margin-top:4px;}
+
+  footer{border-top:1px solid var(--bordersoft);padding:40px 0;}
+  .footerrow{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;}
+  .footerlinks{display:flex;gap:24px;font-size:14px;color:var(--textdim);}
+  .footerlinks a:hover{color:var(--text);}
+  .footerbrand{font-size:13px;color:var(--textfaint);}
+
+  ::selection{background:var(--text);color:var(--bg);}
+  :focus-visible{outline:2px solid var(--textdim);outline-offset:2px;}
+  @media (prefers-reduced-motion:reduce){ *{transition:none !important;} }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <div class="logo" onclick="go('home')">Primz</div>
+    <div class="navlinks">
+      <a onclick="go('realestate')" data-nav="realestate">Real Estate</a>
+      <a onclick="go('creators')" data-nav="creators">Creators</a>
+      <a onclick="go('localbusiness')" data-nav="localbusiness">Local Business</a>
+    </div>
+    <a class="navcta" onclick="go('home'); document.getElementById('customhome').scrollIntoView()">Get started</a>
+  </div>
+</nav>
+
+<div id="home" class="page">
+  <section class="hero">
+    <div class="wrap herogrid">
+      <div>
+        <h1>AI systems that pick up where your team can't.</h1>
+        <p class="sub">Primz builds AI sales assistants, receptionists, and lead response systems for real estate agents, clinics, and creators, so nothing slips through at 9pm on a Sunday.</p>
+        <div class="heroactions">
+          <a class="btn btnprimary" onclick="document.getElementById('segjump').scrollIntoView()">See services</a>
+          <a class="btn btnghost" onclick="document.getElementById('customhome').scrollIntoView()">Request a custom build</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="segrow" id="segjump">
+    <div class="wrap">
+      <div class="sectionlabel">Who we build for</div>
+      <div class="sectiontitle">Pick your world</div>
+      <div class="segrowgrid">
+        <div class="segitem" onclick="go('realestate')">
+          <h3>Real Estate</h3>
+          <p>AI sales follow up, a receptionist that never misses a buyer call, and a listings site built for your brand.</p>
+        </div>
+        <div class="segitem" onclick="go('creators')">
+          <h3>Creators</h3>
+          <p>Track every account from one dashboard and let a bot handle your DMs and comments.</p>
+        </div>
+        <div class="segitem" onclick="go('localbusiness')">
+          <h3>Local Business</h3>
+          <p>A fast website and a receptionist that answers patient or client calls around the clock.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="how" id="how">
+    <div class="wrap">
+      <div class="sectionlabel">Process</div>
+      <div class="sectiontitle">How a build actually happens</div>
+      <div class="howgrid">
+        <div class="howstep">
+          <div class="n">First</div>
+          <h3>A short call</h3>
+          <p>You tell us what's actually breaking: missed leads, slow replies, manual busywork. No generic pitch deck.</p>
+        </div>
+        <div class="howstep">
+          <div class="n">Then</div>
+          <h3>We build against your workflow</h3>
+          <p>The system is wired into how you already work: your DMs, your calls, your listings, not a separate tool you have to check.</p>
+        </div>
+        <div class="howstep">
+          <div class="n">After</div>
+          <h3>You watch it run</h3>
+          <p>We hand it over live, walk you through it, and stay on for fixes as your volume changes.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="custom" id="customhome">
+    <div class="wrap customgrid">
+      <div>
+        <h2>Don't see exactly what you need?</h2>
+        <p class="lead">Most of our best builds started as a one off request. Tell us what you're dealing with and we'll tell you honestly if we can help.</p>
+      </div>
+      <form class="customform" data-segment="general">
+        <div class="field"><label>Name</label><input type="text" required placeholder="Your name"></div>
+        <div class="field"><label>Email or phone</label><input type="text" required placeholder="How should we reach you"></div>
+        <div class="field"><label>What do you need?</label><textarea required placeholder="Tell us what's slowing you down right now"></textarea></div>
+        <button class="btn btnprimary formsubmit" type="submit">Send request</button>
+      </form>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap footerrow">
+      <div class="footerbrand">© 2026 Primz</div>
+      <div class="footerlinks">
+        <a href="mailto:mithileshconnect7@gmail.com">mithileshconnect7@gmail.com</a>
+        <a href="https://instagram.com/primz.ai" target="_blank" rel="noopener">@primz.ai</a>
+        <a href="/privacy.html">Privacy Policy</a>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<div id="realestate" class="page"></div>
+<div id="creators" class="page"></div>
+<div id="localbusiness" class="page"></div>
+
+<script>
+  const segments = {
+    realestate: {
+      heroTitle: "AI systems built for real estate agents.",
+      heroSub: "Follow up with every lead, answer every call, and never lose a buyer to slow response time again.",
+      note: "Most agents start with the AI Sales Assistant and add the receptionist once follow up is handled.",
+      services: [
+        { name:'AI Sales Assistant', desc:'Follows up with prospects automatically, recommends matching properties, and reminds you before a lead goes cold.', old:'₹14,999', now:'₹3,999' },
+        { name:'AI Receptionist', desc:'Answers calls 24/7 so no buyer inquiry goes to voicemail, even after hours.', old:'₹9,999', now:'₹3,999' },
+        { name:'Website', desc:'A clean, fast listings site built for your brand, not a template everyone recognizes.', old:'₹2,999', now:'₹999' },
+        { name:'Insta Sales Chatbot', desc:'Replies to DMs asking about listings and qualifies buyers before they reach you.', old:'₹3,499', now:'₹1,999' },
+        { name:'Insta Engagement Bot', desc:'Auto replies to comments, sends resources when people comment a keyword, and filters out noise.', old:'₹3,999', now:'₹1,999' },
+      ]
+    },
+    creators: {
+      heroTitle: "AI systems built for creators.",
+      heroSub: "Track every account, answer every DM, and keep your comments clean without touching your phone all day.",
+      note: "Built for creators managing more than one account or brand deal at a time.",
+      services: [
+        { name:'Multi Account Tracking Dashboard', desc:'See views, engagement, and growth across every account you manage in one place.', old:'₹4,999', now:'₹2,999' },
+        { name:'Insta Sales Chatbot', desc:'Handles DMs about your products or offers automatically, even while you sleep.', old:'₹3,499', now:'₹1,999' },
+        { name:'Insta Engagement Bot', desc:'Auto replies to comments, sends resources when people comment a keyword, and filters out noise.', old:'₹3,999', now:'₹1,999' },
+      ]
+    },
+    localbusiness: {
+      heroTitle: "AI systems built for local businesses.",
+      heroSub: "For clinics, dentists, and local practices where every missed call is a missed patient.",
+      note: "A website and receptionist that make booking effortless, even outside office hours.",
+      services: [
+        { name:'Website', desc:'A clean, fast site that makes booking an appointment obvious in one look.', old:'₹2,999', now:'₹999' },
+        { name:'AI Receptionist', desc:'Answers patient calls 24/7. Books, reschedules, and answers common questions without a front desk.', old:'₹9,999', now:'₹3,999' },
+        { name:'Insta Sales Chatbot', desc:'Replies to DMs asking about services or pricing and books them in.', old:'₹3,499', now:'₹1,999' },
+        { name:'Insta Engagement Bot', desc:'Auto replies to comments, sends resources when people comment a keyword, and filters out noise.', old:'₹3,999', now:'₹1,999' },
+      ]
+    }
+  };
+
+  function buildSegmentPage(key){
+    const s = segments[key];
+    const servicesHtml = s.services.map(sv => `
+      <div class="servicerow">
+        <div>
+          <div class="servicename">${sv.name}</div>
+          <div class="servicedesc">${sv.desc}</div>
+        </div>
+        <div class="serviceprice">
+          <span class="priceold">${sv.old}</span>
+          <span class="pricenew">${sv.now}</span>
+        </div>
+      </div>
+    `).join('');
+
+    return `
+      <section class="hero">
+        <div class="wrap herogrid">
+          <div>
+            <h1>${s.heroTitle}</h1>
+            <p class="sub">${s.heroSub}</p>
+            <div class="heroactions">
+              <a class="btn btnprimary" onclick="document.getElementById('svc-${key}').scrollIntoView()">See services</a>
+              <a class="btn btnghost" onclick="document.getElementById('custom-${key}').scrollIntoView()">Request a custom build</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="servicepanel" id="svc-${key}">
+        <div class="wrap servicelayout">
+          <div class="servicelist">${servicesHtml}</div>
+          <div class="sidenote">
+            <h4>${s.heroTitle.replace('AI systems built for ','').replace('.','')}</h4>
+            <p>${s.note}</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="custom" id="custom-${key}">
+        <div class="wrap customgrid">
+          <div>
+            <h2>Don't see exactly what you need?</h2>
+            <p class="lead">Most of our best builds started as a one off request. Tell us what you're dealing with and we'll tell you honestly if we can help.</p>
+          </div>
+          <form class="customform" data-segment="${key}">
+            <div class="field"><label>Name</label><input type="text" required placeholder="Your name"></div>
+            <div class="field"><label>Email or phone</label><input type="text" required placeholder="How should we reach you"></div>
+            <div class="field"><label>What do you need?</label><textarea required placeholder="Tell us what's slowing you down right now"></textarea></div>
+            <button class="btn btnprimary formsubmit" type="submit">Send request</button>
+          </form>
+        </div>
+      </section>
+
+      <footer>
+        <div class="wrap footerrow">
+          <div class="footerbrand">© 2026 Primz</div>
+          <div class="footerlinks">
+            <a href="mailto:mithileshconnect7@gmail.com">mithileshconnect7@gmail.com</a>
+            <a href="https://instagram.com/primz.ai" target="_blank" rel="noopener">@primz.ai</a>
+            <a href="/privacy.html">Privacy Policy</a>
+          </div>
+        </div>
+      </footer>
+    `;
+  }
+
+  ['realestate','creators','localbusiness'].forEach(key=>{
+    document.getElementById(key).innerHTML = buildSegmentPage(key);
+  });
+
+  function go(pageId){
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+    document.getElementById(pageId).classList.add('active');
+    document.querySelectorAll('.navlinks a').forEach(a=>a.classList.remove('active'));
+    const navA = document.querySelector(`.navlinks a[data-nav="${pageId}"]`);
+    if(navA) navA.classList.add('active');
+    window.scrollTo({top:0,behavior:'instant'});
+    history.replaceState(null,'', pageId==='home' ? '#' : '#'+pageId);
+  }
+
+  document.querySelectorAll('.customform').forEach(f=>{
+    f.addEventListener('submit', async function(e){
+      e.preventDefault();
+      const inputs = f.querySelectorAll('input,textarea');
+      const btn = f.querySelector('button');
+      const name = inputs[0].value;
+      const contact = inputs[1].value;
+      const needs = inputs[2].value;
+      const segment = f.dataset.segment || 'general';
+      const originalLabel = btn.textContent;
+      btn.textContent = 'Sending...';
+      btn.disabled = true;
+      try{
+        const res = await fetch('/api/requests', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, contact, needs, segment })
+        });
+        if(!res.ok) throw new Error('Request failed');
+        f.innerHTML = '<p style="font-size:14.5px;color:var(--textdim);">Thanks, we got your request. We will get back to you soon.</p>';
+      }catch(err){
+        btn.textContent = 'Something went wrong, try again';
+        btn.disabled = false;
+        setTimeout(()=>{ btn.textContent = originalLabel; }, 2500);
+      }
+    });
+  });
+
+  function routeFromHash(){
+    const h = window.location.hash.replace('#','');
+    if(segments[h]) go(h); else go('home');
+  }
+  window.addEventListener('hashchange', routeFromHash);
+  routeFromHash();
+</script>
+
+</body>
+</html>
